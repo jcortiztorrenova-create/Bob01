@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
 from sklearn.neural_network import MLPClassifier
+from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 
 # =============================================================================
 # METODOLOGIA PARA DETECTAR MAX ITERACIONES SOPORTADAS POR EL HARDWARE
@@ -212,15 +213,26 @@ grid = np.c_[xx.ravel(), yy.ravel()]
 Z = model.predict(grid)
 Z = Z.reshape(xx.shape)
 
-# 6 dibujar frontera de decision
-plt.contourf(xx, yy, Z, alpha=0.3)
-plt.scatter(X[:, 0], X[:, 1], c=y, edgecolor="k")
-plt.xlabel("petal length")
-plt.ylabel("petal width")
-plt.title(
+# 6 dibujar frontera de decision y matriz de confusion
+fig, axes = plt.subplots(1, 2, figsize=(14, 5))
+
+axes[0].contourf(xx, yy, Z, alpha=0.3)
+axes[0].scatter(X[:, 0], X[:, 1], c=y, edgecolor="k")
+axes[0].set_xlabel("petal length")
+axes[0].set_ylabel("petal width")
+axes[0].set_title(
     f"Neural Network Decision Boundary\n"
     f"(max_iter={detection['max_iter']:,}, "
     f"real_iter={model.n_iter_}, "
     f"score={model.score(X_test, y_test):.2%})"
 )
+
+# 7 matriz de confusion
+y_pred = model.predict(X_test)
+cm = confusion_matrix(y_test, y_pred)
+disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=iris.target_names)
+disp.plot(ax=axes[1], colorbar=False)
+axes[1].set_title("Confusion Matrix (test set)")
+
+plt.tight_layout()
 plt.show()
