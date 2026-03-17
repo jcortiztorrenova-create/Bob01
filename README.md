@@ -65,3 +65,38 @@ plt.show()
 - **Dataset**: Iris (solo petal length y petal width)
 - **Modelo**: MLPClassifier con 2 capas ocultas de 10 neuronas cada una
 - **Visualización**: Frontera de decisión con `contourf` y puntos reales del dataset
+
+## Metodología de detección de max iteraciones por hardware
+
+El script `neural_network_iris.py` incluye una metodología automática para detectar el máximo de iteraciones que el hardware soporta:
+
+### Pasos
+
+1. **Lectura de hardware**: Se obtienen CPUs y RAM desde `/proc/meminfo`
+2. **Benchmark**: Se ejecutan 50 iteraciones con `partial_fit` y se mide el tiempo promedio por iteración
+3. **Cálculo de max_iter**: Se divide el presupuesto de tiempo (300s por defecto) entre el tiempo por iteración
+4. **Verificación de memoria**: Se confirma que hay RAM suficiente para operar
+5. **Early stopping**: Se usa `early_stopping=True` con `tol=1e-6` y `n_iter_no_change=200` para detener el entrenamiento cuando el modelo converge, sin desperdiciar iteraciones
+
+### Ejemplo de salida
+
+```
+Hardware detectado:
+  CPUs:             4
+  RAM total:        16081 MB
+  RAM disponible:   15381 MB
+
+Benchmark (50 iteraciones):
+  Tiempo/iter:      1.069 ms (+/- 0.140 ms)
+
+Resultado:
+  max_iter:         280,518
+  Iteraciones reales (convergencia): 484
+  Score en test:    90%
+```
+
+### Ejecución
+
+```bash
+python neural_network_iris.py
+```
